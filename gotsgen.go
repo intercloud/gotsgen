@@ -64,9 +64,9 @@ func (g TSGen) Init(t string) error {
 // New creates a new generator.
 // It takes 3 parameters:
 //
-//     start is the starting point of thetime series
-//     period is the sampling rate
-//     samples is the number of measurements of the timeseries
+//     - start    is the starting point of thetime series
+//     - period   is the sampling rate
+//     - samples  is the number of measurements of the timeseries
 //
 // You can use it like this:
 //
