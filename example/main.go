@@ -38,15 +38,12 @@ func drawChart(res http.ResponseWriter, req *http.Request) {
     end := time.Now()
     start := end.Add(-duration)
 
-    normts := &gotsgen.TimeSeries{
-        XValues: []time.Time{},
-        YValues: []float64{},
-    }
-    gotsgen.AddData(normts, start, duration/SAMPLES, SAMPLES)
+    gts := gotsgen.New(start, duration/SAMPLES, SAMPLES)
+    gts.Init("rand")
     // add generated data to chart TS
-    for i := 0 ; i < len(normts.XValues); i++ {
-        ts.XValues = append(ts.XValues, normts.XValues[i])
-        ts.YValues = append(ts.YValues, normts.YValues[i])
+    for i := 0 ; i < len(gts.TS.XValues); i++ {
+        ts.XValues = append(ts.XValues, gts.TS.XValues[i])
+        ts.YValues = append(ts.YValues, gts.TS.YValues[i])
     }
 
     if len(ts.XValues) == 0 {
