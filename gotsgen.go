@@ -23,7 +23,7 @@ func (g TSGen) addRandomData(r *rand.Rand) {
     t := g.Start
     for i := 0; i < g.Samples; i++ {
         g.TS.XValues = append(g.TS.XValues, t)
-//        g.TS.YValues = append(g.TS.YValues, g.Rand.Float64())
+        g.TS.YValues = append(g.TS.YValues, r.Float64())
         t = t.Add(g.Period)
     }
 }
