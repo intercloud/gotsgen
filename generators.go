@@ -22,7 +22,7 @@ import (
 
 func (g TSGen) addRandomData(r *rand.Rand) {
     t := g.Start
-    for i := 0; i < g.Samples; i++ {
+    for i := 0; i < int(g.Samples); i++ {
         g.TS.XValues = append(g.TS.XValues, t)
         g.TS.YValues = append(g.TS.YValues, r.Float64())
         t = t.Add(g.Period)
@@ -31,7 +31,7 @@ func (g TSGen) addRandomData(r *rand.Rand) {
 
 func (g TSGen) addNormalData(r *rand.Rand) {
     t := g.Start
-    for i := 0; i < g.Samples; i++ {
+    for i := 0; i < int(g.Samples); i++ {
         g.TS.XValues = append(g.TS.XValues, t)
         g.TS.YValues = append(g.TS.YValues, r.NormFloat64())
         t = t.Add(g.Period)
@@ -43,7 +43,7 @@ func (g TSGen) addDerivativeData(r *rand.Rand) {
     p := c
     n := c + r.NormFloat64()
     t := g.Start
-    for i := 0; i < g.Samples; i++ {
+    for i := 0; i < int(g.Samples); i++ {
         g.TS.XValues = append(g.TS.XValues, t)
         g.TS.YValues = append(g.TS.YValues, (n - p)/2)
         t = t.Add(g.Period)

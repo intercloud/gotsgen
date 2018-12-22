@@ -31,7 +31,7 @@ type TimeSeries struct {
 type TSGen struct {
   Start time.Time
   Period time.Duration
-  Samples int
+  Samples uint
   TS *TimeSeries}
 
 // Init starts the generator.
@@ -62,7 +62,7 @@ func (g TSGen) Init(t string) {
 //      end := time.Now()
 //      start := end.Add(-duration)
 //      gts = gotsgen.New(start, duration/200, 200)
-func New(start time.Time, period time.Duration, samples int) *TSGen {
+func New(start time.Time, period time.Duration, samples uint) *TSGen {
     ts := &TimeSeries{
         XValues: []time.Time{},
         YValues: []float64{},

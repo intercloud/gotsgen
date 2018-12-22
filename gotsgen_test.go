@@ -18,6 +18,9 @@ func TestNew(t *testing.T) {
     if tsGen.Start != start {
          t.Errorf("Expected start date to be %v, got %v\n", start, tsGen.Start)
     }
+    if tsGen.Period != duration/200 {
+         t.Errorf("Expected period to be %v, got %v\n", duration/200, tsGen.Period)
+    }
 }
 
 func TestInit(t *testing.T) {
@@ -27,7 +30,12 @@ func TestInit(t *testing.T) {
 
     tsGen := New(start, duration/200, 200)
 
-
+    if len(tsGen.TS.XValues) != 0 {
+         t.Errorf("Expected time series to have no value got %d\n", len(tsGen.TS.XValues))
+    }
     tsGen.Init("rand")
+    if len(tsGen.TS.XValues) != 200 {
+         t.Errorf("Expected time series to have 200 values got %d\n", len(tsGen.TS.XValues))
+    }
 }
 
