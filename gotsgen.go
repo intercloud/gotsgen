@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2019 InterCloud
+ *
+ * Permission to use, copy, modify, and distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+
 package gotsgen
 
 import (
@@ -5,53 +21,27 @@ import (
     "math/rand"
 )
 
-// TimeSeries ...
+// TimeSeries contains time series measurements
 type TimeSeries struct {
     XValues []time.Time
     YValues []float64
 }
 
-// TSGen ...
+// TSGen contains informations to generate a time series
 type TSGen struct {
   Start time.Time
   Period time.Duration
   Samples int
-  TS *TimeSeries
-}
+  TS *TimeSeries}
 
-
-func (g TSGen) addRandomData(r *rand.Rand) {
-    t := g.Start
-    for i := 0; i < g.Samples; i++ {
-        g.TS.XValues = append(g.TS.XValues, t)
-        g.TS.YValues = append(g.TS.YValues, r.Float64())
-        t = t.Add(g.Period)
-    }
-}
-
-func (g TSGen) addNormalData(r *rand.Rand) {
-    t := g.Start
-    for i := 0; i < g.Samples; i++ {
-        g.TS.XValues = append(g.TS.XValues, t)
-        g.TS.YValues = append(g.TS.YValues, r.NormFloat64())
-        t = t.Add(g.Period)
-    }
-}
-
-func (g TSGen) addDerivativeData(r *rand.Rand) {
-    c := r.Float64()
-    p := c
-    n := c + r.NormFloat64()
-    t := g.Start
-    for i := 0; i < g.Samples; i++ {
-        g.TS.XValues = append(g.TS.XValues, t)
-        g.TS.YValues = append(g.TS.YValues, (n - p)/2)
-        t = t.Add(g.Period)
-    }
-
-}
-
-// Init ...
+// Init starts the generator.
+// It takes a type of generator as parameter.
+// The valid types are:
+// * "rand"
+// * "norm"
+// * "deriv"
+//
+//      gts.Init("rand")
 func (g TSGen) Init(t string) {
     typeFunc := map[string]interface{}{
         "rand": g.addRandomData,
@@ -62,7 +52,16 @@ func (g TSGen) Init(t string) {
     typeFunc[t].(func(*rand.Rand))(r)
 }
 
-// New
+// New creates a new generator.
+// It takes 3 parameter
+// * start is the starting point of thetime series
+// * period is the sampling rate
+// * samples is the number of measurements of the timeseries
+//
+//      duration, _ := time.ParseDuration("24h")
+//      end := time.Now()
+//      start := end.Add(-duration)
+//      gts = gotsgen.New(start, duration/200, 200)
 func New(start time.Time, period time.Duration, samples int) *TSGen {
     ts := &TimeSeries{
         XValues: []time.Time{},
