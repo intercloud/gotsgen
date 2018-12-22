@@ -33,9 +33,17 @@ func TestInit(t *testing.T) {
     if len(tsGen.TS.XValues) != 0 {
          t.Errorf("Expected time series to have no value got %d\n", len(tsGen.TS.XValues))
     }
-    tsGen.Init("rand")
+    err := tsGen.Init("rand")
+    if err != nil {
+         t.Errorf("Unexpected error %s\n", err.Error())
+    }
     if len(tsGen.TS.XValues) != 200 {
          t.Errorf("Expected time series to have 200 values got %d\n", len(tsGen.TS.XValues))
+    }
+
+    err = tsGen.Init("fake")
+    if err == nil || err.Error() != "Unknown generator type" {
+         t.Errorf("Expected error Unknown generator type but got %v\n", err)
     }
 }
 

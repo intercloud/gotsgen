@@ -18,16 +18,17 @@ package gotsgen
 
 import (
     "time"
+    "errors"
     "math/rand"
 )
 
-// TimeSeries contains time series measurements
+// TimeSeries contains time series measurements.
 type TimeSeries struct {
     XValues []time.Time
     YValues []float64
 }
 
-// TSGen contains informations to generate a time series
+// TSGen contains informations to generate a time series.
 type TSGen struct {
   Start time.Time
   Period time.Duration
@@ -37,26 +38,37 @@ type TSGen struct {
 // Init starts the generator.
 // It takes a type of generator as parameter.
 // The valid types are:
-// * "rand"
-// * "norm"
-// * "deriv"
+//
+//     "rand":  values are random generated, see `math/rand` package (Float64())
+//     "norm":  values are generated from a normal distribution, see `math/rand` package (NormFloat64())
+//     "deriv": values are generated from the dicrete derivative of a continuously and randomly increasing counter
+//
+// You can use it like this:
 //
 //      gts.Init("rand")
-func (g TSGen) Init(t string) {
+func (g TSGen) Init(t string) error {
     typeFunc := map[string]interface{}{
         "rand": g.addRandomData,
         "norm": g.addNormalData,
         "deriv": g.addDerivativeData,
     }
+    if _, ok := typeFunc[t]; !ok {
+        return errors.New("Unknown generator type")
+    }
     r := rand.New(rand.NewSource(time.Now().UnixNano()))
     typeFunc[t].(func(*rand.Rand))(r)
+
+    return nil
 }
 
 // New creates a new generator.
-// It takes 3 parameter
-// * start is the starting point of thetime series
-// * period is the sampling rate
-// * samples is the number of measurements of the timeseries
+// It takes 3 parameters:
+//
+//     start is the starting point of thetime series
+//     period is the sampling rate
+//     samples is the number of measurements of the timeseries
+//
+// You can use it like this:
 //
 //      duration, _ := time.ParseDuration("24h")
 //      end := time.Now()
