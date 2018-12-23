@@ -18,5 +18,4 @@
 Package gotsgen implements a multi time series generator.
 See example/main.go for a working example of how to use this library.
 */
-
 package gotsgen

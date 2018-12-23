@@ -17,35 +17,36 @@
 package gotsgen
 
 import (
-    "math/rand"
+	"math/rand"
+	"time"
 )
 
-func (g TSGen) addRandomData(r *rand.Rand) {
-    t := g.Start
-    for i := 0; i < int(g.Samples); i++ {
-        g.TS.XValues = append(g.TS.XValues, t)
-        g.TS.YValues = append(g.TS.YValues, r.Float64())
-        t = t.Add(g.Period)
-    }
+func addRandomData(ts *TimeSeries, start time.Time, period time.Duration, samples uint, r *rand.Rand) {
+	t := start
+	for i := 0; i < int(samples); i++ {
+		ts.XValues = append(ts.XValues, t)
+		ts.YValues = append(ts.YValues, r.Float64())
+		t = t.Add(period)
+	}
 }
 
-func (g TSGen) addNormalData(r *rand.Rand) {
-    t := g.Start
-    for i := 0; i < int(g.Samples); i++ {
-        g.TS.XValues = append(g.TS.XValues, t)
-        g.TS.YValues = append(g.TS.YValues, r.NormFloat64())
-        t = t.Add(g.Period)
-    }
+func addNormalData(ts *TimeSeries, start time.Time, period time.Duration, samples uint, r *rand.Rand) {
+	t := start
+	for i := 0; i < int(samples); i++ {
+		ts.XValues = append(ts.XValues, t)
+		ts.YValues = append(ts.YValues, r.NormFloat64())
+		t = t.Add(period)
+	}
 }
 
-func (g TSGen) addDerivativeData(r *rand.Rand) {
-    c := r.Float64()
-    p := c
-    n := c + r.NormFloat64()
-    t := g.Start
-    for i := 0; i < int(g.Samples); i++ {
-        g.TS.XValues = append(g.TS.XValues, t)
-        g.TS.YValues = append(g.TS.YValues, (n - p)/2)
-        t = t.Add(g.Period)
-    }
+func addDerivativeData(ts *TimeSeries, start time.Time, period time.Duration, samples uint, r *rand.Rand) {
+	c := r.Float64()
+	p := c
+	n := c + r.NormFloat64()
+	t := start
+	for i := 0; i < int(samples); i++ {
+		ts.XValues = append(ts.XValues, t)
+		ts.YValues = append(ts.YValues, (n-p)/2)
+		t = t.Add(period)
+	}
 }

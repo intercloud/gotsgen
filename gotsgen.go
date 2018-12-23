@@ -17,73 +17,64 @@
 package gotsgen
 
 import (
-    "time"
-    "errors"
-    "math/rand"
+	"errors"
+	"fmt"
+	"math/rand"
+	"time"
 )
 
 // TimeSeries contains time series measurements.
 type TimeSeries struct {
-    XValues []time.Time
-    YValues []float64
+	XValues []time.Time
+	YValues []float64
 }
 
-// TSGen contains informations to generate a time series.
-type TSGen struct {
-  Start time.Time
-  Period time.Duration
-  Samples uint
-  TS *TimeSeries}
-
-// Init starts the generator.
-// It takes a type of generator as parameter.
-// The valid types are:
+// Query generates a time series from the given type.
+// It takes 3 parameters:
+//
+//     - start    is the starting point of the time series
+//     - end      is the end of time series scale
+//     - samples  is the number of measurements of the time series
+//     - type     is the category of generator
+//
+// The valid types of generators are:
 //
 //     "rand":  values are random generated, see `math/rand` package (Float64())
 //     "norm":  values are generated from a normal distribution, see `math/rand` package (NormFloat64())
 //     "deriv": values are generated from the dicrete derivative of a continuously and randomly increasing counter
 //
-// You can use it like this:
-//
-//      gts.Init("rand")
-func (g TSGen) Init(t string) error {
-    typeFunc := map[string]interface{}{
-        "rand": g.addRandomData,
-        "norm": g.addNormalData,
-        "deriv": g.addDerivativeData,
-    }
-    if _, ok := typeFunc[t]; !ok {
-        return errors.New("Unknown generator type")
-    }
-    r := rand.New(rand.NewSource(time.Now().UnixNano()))
-    typeFunc[t].(func(*rand.Rand))(r)
-
-    return nil
-}
-
-// New creates a new generator.
-// It takes 3 parameters:
-//
-//     - start    is the starting point of thetime series
-//     - period   is the sampling rate
-//     - samples  is the number of measurements of the timeseries
-//
-// You can use it like this:
+// Example:
 //
 //      duration, _ := time.ParseDuration("24h")
 //      end := time.Now()
 //      start := end.Add(-duration)
-//      gts = gotsgen.New(start, duration/200, 200)
-func New(start time.Time, period time.Duration, samples uint) *TSGen {
-    ts := &TimeSeries{
-        XValues: []time.Time{},
-        YValues: []float64{},
-    }
-    tsGen := &TSGen{
-        TS: ts,
-        Start: start,
-        Period: period,
-        Samples: samples,
-    }
-    return tsGen
+//      ts, err := Query(start, end, 200, "rand")
+func Query(start time.Time, end time.Time, samples uint, t string) (*TimeSeries, error) {
+	typeFunc := map[string]interface{}{
+		"rand":  addRandomData,
+		"norm":  addNormalData,
+		"deriv": addDerivativeData,
+	}
+
+	ts := &TimeSeries{
+		XValues: []time.Time{},
+		YValues: []float64{},
+	}
+
+	// todo test if end date != start date and if end date > start date
+	if !end.After(start) || end.Equal(start) {
+		return ts, errors.New("Bad time range")
+	}
+	// test if generator type is valid
+	if _, ok := typeFunc[t]; !ok {
+		return ts, errors.New("Unknown generator type")
+	}
+
+	duration := end.Sub(start).Seconds() / float64(samples)
+	period, _ := time.ParseDuration(fmt.Sprintf("%fs", duration))
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	// call the generator (see generators.go) corresponding to the given category
+	typeFunc[t].(func(*TimeSeries, time.Time, time.Duration, uint, *rand.Rand))(ts, start, period, samples, r)
+
+	return ts, nil
 }

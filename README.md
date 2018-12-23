@@ -42,13 +42,7 @@ You have to instantiate the package first (let's say you want a one day time ser
  end := time.Now()
  start := end.Add(-duration)
 
- gts := gotsgen.New(start, duration/200, 200)
-```
-
-Then you can generate random measurements from one of the 3 generators:
-
-```Go
-  gts.Init("rand")
+ gts := gotsgen.Query(start, end, 200, "rand")
 ```
 
 If you want to test an example program, simply run 
